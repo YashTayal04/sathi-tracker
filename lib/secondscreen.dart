@@ -36,6 +36,7 @@ class SecondScreen extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                     child: TextField(
                       decoration: InputDecoration(
+                        // prefixIcon: Icon(Icons.keyboard),
                         border: OutlineInputBorder(
                           borderRadius: const BorderRadius.all(
                             const Radius.circular(8),
