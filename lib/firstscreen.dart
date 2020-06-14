@@ -56,7 +56,7 @@ class MainScreen extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 30),
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                       child: TextField(
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.phone),
