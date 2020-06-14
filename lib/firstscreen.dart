@@ -1,14 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import "image_banner.dart";
 import "secondscreen.dart";
 
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // title: 'Welcome to Flutter',
-        // home: Scaffold(
-
         appBar: AppBar(
           title: Text("Add your details "),
         ),
@@ -24,7 +21,7 @@ class MainScreen extends StatelessWidget {
                 ))),
 
             Container(
-              height: 0.40 * MediaQuery.of(context).size.height,
+              height: 0.36 * MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: Padding(
                 padding: EdgeInsets.fromLTRB(75.0, 0.0, 75.0, 0.0),
@@ -93,13 +90,8 @@ class MainScreen extends StatelessWidget {
                 ),
               ),
             ),
+            ImageBanner("assets/images/way.jpg"),
 
-            // Container(
-            //     color: Colors.red,
-            //     child:Text(
-            //         "Hello"
-            //     )
-            // )
           ],
         ));
   }
