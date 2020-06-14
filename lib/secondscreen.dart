@@ -47,9 +47,13 @@ class SecondScreen extends StatelessWidget {
                   SizedBox(
                     height: 40,
                     width: 40,
-                    child: RaisedButton(
+                    child: RaisedButton.icon(
+                      icon: Icon(
+                        Icons.group_add,
+                        color: Colors.white,
+                      ),
                       color: Color(0xFF1963F2),
-                      child: Text(
+                      label: Text(
                         "Join trip",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
@@ -80,9 +84,11 @@ class SecondScreen extends StatelessWidget {
                   SizedBox(
                     height: 40,
                     width: 40,
-                    child: RaisedButton(
+                    child: RaisedButton.icon(
+                      icon: Icon(Icons.add, color: Colors.white,),
                       color: Color(0xFF1963F2),
-                      child: Text(
+
+                      label: Text(
                         "Create trip",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
