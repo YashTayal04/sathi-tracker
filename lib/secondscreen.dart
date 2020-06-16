@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'thirdscreen.dart';
 
 class SecondScreen extends StatelessWidget {
   @override
@@ -62,7 +63,7 @@ class SecondScreen extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SecondScreen()));
+                                builder: (context) => ThirdScreen()));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),
@@ -97,7 +98,7 @@ class SecondScreen extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SecondScreen()));
+                                builder: (context) => ThirdScreen()));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),
@@ -107,13 +108,6 @@ class SecondScreen extends StatelessWidget {
                 ],
               ),
             )
-            // ),
-            // Container(
-            //     color: Colors.red,
-            //     child:Text(
-            //         "Hello"
-            //     )
-            // )
           ],
         ));
   }
