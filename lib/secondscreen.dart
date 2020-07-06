@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'thirdscreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SecondScreen extends StatelessWidget {
+  final userGroupIDInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +38,7 @@ class SecondScreen extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                     child: TextField(
+                      controller: userGroupIDInputController,
                       decoration: InputDecoration(
                         // prefixIcon: Icon(Icons.keyboard),
                         border: OutlineInputBorder(
@@ -60,6 +63,11 @@ class SecondScreen extends StatelessWidget {
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                       onPressed: () {
+                        if (userGroupIDInputController.text.isNotEmpty ) {
+                            Firestore.instance.document('users/'+"1").setData({
+                              "group_id": userGroupIDInputController.text,
+                            },merge: true);
+                          }
                         Navigator.push(
                             context,
                             MaterialPageRoute(

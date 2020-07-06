@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import "image_banner.dart";
 import "secondscreen.dart";
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainScreen extends StatelessWidget {
+  final userNameInputController = TextEditingController();
+  final userPhoneInputController = TextEditingController();
+  final a='1';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +23,6 @@ class MainScreen extends StatelessWidget {
                   "Sathi Tracker",
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
                 ))),
-
             Container(
               height: 0.36 * MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
@@ -38,6 +41,7 @@ class MainScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                       child: TextField(
+                        controller: userNameInputController,
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.person),
                           border: OutlineInputBorder(
@@ -58,6 +62,7 @@ class MainScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                       child: TextField(
+                        controller: userPhoneInputController,
                         decoration: InputDecoration(
                           prefixIcon: Icon(Icons.phone),
                           border: OutlineInputBorder(
@@ -78,6 +83,13 @@ class MainScreen extends StatelessWidget {
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                         onPressed: () {
+                          if (userPhoneInputController.text.isNotEmpty &&
+                              userNameInputController.text.isNotEmpty) {
+                            Firestore.instance.document('users/'+a).setData({
+                              "name": userPhoneInputController.text,
+                              "phone": userNameInputController.text
+                            });
+                          }
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -93,7 +105,6 @@ class MainScreen extends StatelessWidget {
               ),
             ),
             ImageBanner("assets/images/way.jpg"),
-
           ],
         ));
   }
