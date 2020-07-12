@@ -2,8 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'thirdscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firstscreen.dart';
+import 'dart:math';
+
+class Group {
+  var gid;
+  Group(this.gid);
+}
+
+Group group;
 
 class SecondScreen extends StatelessWidget {
+  var id;
+  SecondScreen({this.id});
   final userGroupIDInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -62,16 +73,22 @@ class SecondScreen extends StatelessWidget {
                         "Join trip",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
-                      onPressed: () {
-                        if (userGroupIDInputController.text.isNotEmpty ) {
-                            Firestore.instance.document('users/'+"1").setData({
-                              "group_id": userGroupIDInputController.text,
-                            },merge: true);
-                          }
+                      onPressed: () async {
+                        // print(id.id);
+                        if (userGroupIDInputController.text.isNotEmpty) {
+                          group = Group(userGroupIDInputController.text);
+                          await Firestore.instance
+                              .collection('users')
+                              .document(id.id)
+                              .setData({
+                            "group_id": userGroupIDInputController.text,
+                          }, merge: true);
+                        }
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ThirdScreen()));
+                                builder: (context) =>
+                                    ThirdScreen(id: id, group: group)));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),
@@ -95,18 +112,29 @@ class SecondScreen extends StatelessWidget {
                     height: 40,
                     width: 40,
                     child: RaisedButton.icon(
-                      icon: Icon(Icons.add, color: Colors.white,),
+                      icon: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
                       color: Color(0xFF1963F2),
-
                       label: Text(
                         "Create trip",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        Random random = new Random();
+                        group = Group(random.nextInt(8999) + 1000);
+                        await Firestore.instance
+                            .collection('users')
+                            .document(id.id)
+                            .setData({
+                          "group_id": group.gid,
+                        }, merge: true);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ThirdScreen()));
+                                builder: (context) =>
+                                    ThirdScreen(id: id, group: group)));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),

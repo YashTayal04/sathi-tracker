@@ -3,10 +3,16 @@ import "image_banner.dart";
 import "secondscreen.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class Id {
+  var id;
+  Id(this.id);
+}
+
+Id id;
+
 class MainScreen extends StatelessWidget {
   final userNameInputController = TextEditingController();
   final userPhoneInputController = TextEditingController();
-  final a='1';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,18 +88,30 @@ class MainScreen extends StatelessWidget {
                           "Start",
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (userPhoneInputController.text.isNotEmpty &&
                               userNameInputController.text.isNotEmpty) {
-                            Firestore.instance.document('users/'+a).setData({
-                              "name": userPhoneInputController.text,
-                              "phone": userNameInputController.text
+                            //       if(id!=null){
+                            //         // print(id.id);
+                            //   Firestore.instance.collection('users').document(id.id).updateData({
+                            //     "name": userNameInputController.text,
+                            //     "phone": userPhoneInputController.text
+                            //   });
+                            // }
+                            // else{
+                            await Firestore.instance.collection('users').add({
+                              "name": userNameInputController.text,
+                              "phone": userPhoneInputController.text
+                            }).then((value) {
+                              id = Id(value.documentID);
+                              //  print(id.id);
                             });
+                            // }
                           }
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SecondScreen()));
+                                  builder: (context) => SecondScreen(id: id)));
                         },
                         shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(8.0),

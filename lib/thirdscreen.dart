@@ -2,10 +2,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'secondscreen.dart';
+import 'firstscreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+var groupId;
 
 class ThirdScreen extends StatefulWidget {
   // ThirdScreen() : super();
-  // final String title =" Maps";
+  // final String title =" Maps";s
+
+  final Id id;
+  final Group group;
+  ThirdScreen({this.id, this.group});
   @override
   MapsState createState() => MapsState();
 }
@@ -25,9 +33,13 @@ class MapsState extends State<ThirdScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //  Firestore.instance.collection("users").document(id.id).get().then((value){
+    //   print(value.data["group_id"]);
+    //   groupId=value.data["group_id"];
+    // });
     return Scaffold(
       appBar: AppBar(
-        title: Text("Group ID"),
+        title: Text((group.gid).toString()),
       ),
 
       // body: Stack(
@@ -62,39 +74,46 @@ class MapsState extends State<ThirdScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              
-    IconButton(
-      icon: Icon(
-        Icons.group,
-        color: Colors.black,
-      ),
-      onPressed: () {
-        // do something
-      },
-    ),
-              
+              IconButton(
+                icon: Icon(
+                  Icons.group,
+                  color: Colors.black,
+                ),
+                onPressed: () {
+                  // do something
+                  //    Firestore.instance.collection("users").document(id.id).get().then((value){
+                  //   print(value.data["group_id"]);
+                  //   groupId=value.data["group_id"];
+                  // });
+                  Firestore.instance
+                      .collection("users")
+                      .where("group_id", isEqualTo: group.gid)
+                      .snapshots()
+                      .listen((result) {
+                    result.documents.forEach((result) {
+                      print(result.data);
+                    });
+                  });
+                },
+              ),
               OutlineButton.icon(
-                      label: Text(
-                        "end",
-                        style: TextStyle(fontSize: 20, color: Colors.red),
-                      ),
-                      icon: Icon(
-                        Icons.cancel,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SecondScreen()));
-                      },
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(8.0),
-                      ),
-                    ),
+                label: Text(
+                  "end",
+                  style: TextStyle(fontSize: 20, color: Colors.red),
+                ),
+                icon: Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SecondScreen()));
+                },
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(8.0),
+                ),
+              ),
             ],
-
-
           ),
         ),
       ),
