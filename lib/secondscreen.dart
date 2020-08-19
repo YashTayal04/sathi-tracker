@@ -75,20 +75,30 @@ class SecondScreen extends StatelessWidget {
                       ),
                       onPressed: () async {
                         // print(id.id);
+
                         if (userGroupIDInputController.text.isNotEmpty) {
                           group = Group(userGroupIDInputController.text);
-                          await Firestore.instance
+                          QuerySnapshot result = await Firestore.instance
                               .collection('users')
-                              .document(id.id)
-                              .setData({
-                            "group_id": userGroupIDInputController.text,
-                          }, merge: true);
+                              .where('group_id',
+                                  isEqualTo: userGroupIDInputController.text)
+                              .limit(1)
+                              .getDocuments();
+                          if (result.documents.length == 1) {
+                            await Firestore.instance
+                                .collection('users')
+                                .document(id.id)
+                                .updateData({
+                              "group_id": userGroupIDInputController.text,
+                            });
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ThirdScreen(id: id, group: group)));
+                          }
                         }
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ThirdScreen(id: id, group: group)));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),
@@ -127,9 +137,9 @@ class SecondScreen extends StatelessWidget {
                         await Firestore.instance
                             .collection('users')
                             .document(id.id)
-                            .setData({
+                            .updateData({
                           "group_id": group.gid,
-                        }, merge: true);
+                        });
                         Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -105,9 +105,17 @@ class MapsState extends State<ThirdScreen> {
                   Icons.cancel,
                   color: Colors.red,
                 ),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SecondScreen()));
+                onPressed: () async {
+                  await Firestore.instance
+                      .collection('users')
+                      .document(id.id)
+                      .updateData({
+                    "group_id": "",
+                  });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SecondScreen(id: id)));
                 },
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(8.0),

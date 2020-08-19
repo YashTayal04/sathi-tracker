@@ -101,7 +101,8 @@ class MainScreen extends StatelessWidget {
                             // else{
                             await Firestore.instance.collection('users').add({
                               "name": userNameInputController.text,
-                              "phone": userPhoneInputController.text
+                              "phone": userPhoneInputController.text,
+                              "group_id": ""
                             }).then((value) {
                               id = Id(value.documentID);
                               //  print(id.id);
