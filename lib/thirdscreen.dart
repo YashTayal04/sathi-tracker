@@ -56,6 +56,7 @@ class MapsState extends State<ThirdScreen> {
   }
 
   void updateLocation(String lat, String lng) async {
+    _markers();
     await Firestore.instance
         .collection('users')
         .document(id.id)
@@ -75,6 +76,35 @@ class MapsState extends State<ThirdScreen> {
             group.add(result.data);
           });
     });
+  }
+
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  MarkerId selectedMarker;
+  int _markerIdCounter = 0;
+  void _markers() {
+    final int markerCount = markers.length;
+    if (markerCount == 12) {
+      return;
+    }
+    if(markerCount == group.length) {
+      markers.clear();
+      _markerIdCounter = 0;
+    }
+    for(int index = _markerIdCounter ; index < group.length ; index++) {
+      final String markerIdVal = 'marker_id_$_markerIdCounter';
+      _markerIdCounter++;
+      final MarkerId markerId = MarkerId(markerIdVal);
+      final Marker marker = Marker(
+        markerId: markerId,
+        position: LatLng(
+          group[index]['lat'], group[index]['lng']
+        ),
+        infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      );
+      setState(() {
+        markers[markerId] = marker;
+      });
+    }
   }
 
   @override
