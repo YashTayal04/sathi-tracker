@@ -5,6 +5,8 @@ import 'secondscreen.dart';
 import 'firstscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 var groupId;
 
@@ -34,13 +36,16 @@ class MapsState extends State<ThirdScreen> {
 
   var geolocator = Geolocator();
   var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+  var group = [];
   StreamSubscription<Position> positionStream;
   @override
   void initState() {
     super.initState();
+    updateGroup();
     positionStream = geolocator.getPositionStream(locationOptions).listen(
       (Position position) {
           updateLocation(position.latitude.toString(), position.longitude.toString());
+          updateGroup();
       });
   }
 
@@ -59,101 +64,157 @@ class MapsState extends State<ThirdScreen> {
       "lng": lng
     });
   }
+
+  void updateGroup() {
+    Firestore.instance
+      .collection("users")
+      .where("group_id", isEqualTo: widget.group.gid)
+      .snapshots()
+      .listen((result) {
+          result.documents.forEach((result) {
+            group.add(result.data);
+          });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    //  Firestore.instance.collection("users").document(id.id).get().then((value){
-    //   print(value.data["group_id"]);
-    //   groupId=value.data["group_id"];
-    // });
     return Scaffold(
       appBar: AppBar(
-        title: Text((group.gid).toString()),
+        title: Text((widget.group.gid).toString()),
       ),
-
-      // body: Stack(
-      //   children: <Widget>[
-      //     GoogleMap(
-      //       onMapCreated: _onMapCreated,
-      // initialCameraPosition: CameraPosition(target: _center,zoom: 11.0,),
-      //       mapType: _currentMapType,
-      //       markers: _markers,
-      //       onCameraMove: _onCameraMove,
-      //     ),
-      //   ],
-      // )
-      body: Stack(
-        children: <Widget>[
-          Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(28.644800, 77.216721), zoom: 12),
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ))
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        child: Container(
-          height: 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.group,
-                  color: Colors.black,
-                ),
-                onPressed: () {
-                  // do something
-                  //    Firestore.instance.collection("users").document(id.id).get().then((value){
-                  //   print(value.data["group_id"]);
-                  //   groupId=value.data["group_id"];
-                  // });
-                  Firestore.instance
-                      .collection("users")
-                      .where("group_id", isEqualTo: group.gid)
-                      .snapshots()
-                      .listen((result) {
-                    result.documents.forEach((result) {
-                      print(result.data);
-                    });
-                  });
-                },
-              ),
-              OutlineButton.icon(
-                label: Text(
-                  "end",
-                  style: TextStyle(fontSize: 20, color: Colors.red),
-                ),
-                icon: Icon(
-                  Icons.cancel,
-                  color: Colors.red,
-                ),
-                onPressed: () async {
-                  await Firestore.instance
-                      .collection('users')
-                      .document(id.id)
-                      .updateData({
-                    "group_id": "",
-                  });
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SecondScreen(id: id)));
-                },
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(8.0),
-                ),
-              ),
-            ],
-          ),
+      body: SlidingUpPanel(
+        panelBuilder: (sc) => _panel(sc),
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+        minHeight: 50,
+        body: Stack(
+          children: <Widget>[
+            Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(38.2496167, -121.91075), zoom: 12),
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  markers: Set<Marker>.of(markers.values),
+                ))
+          ],
         ),
       ),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: Colors.white,
+      //   child: Container(
+      //     height: 40,
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: <Widget>[
+      //         IconButton(
+      //           icon: Icon(
+      //             Icons.group,
+      //             color: Colors.black,
+      //           ),
+      //           onPressed: () {
+      //             // do something
+      //             //    Firestore.instance.collection("users").document(id.id).get().then((value){
+      //             //   print(value.data["group_id"]);
+      //             //   groupId=value.data["group_id"];
+      //             // });
+      //             Firestore.instance
+      //                 .collection("users")
+      //                 .where("group_id", isEqualTo: group.gid)
+      //                 .snapshots()
+      //                 .listen((result) {
+      //               result.documents.forEach((result) {
+      //                 print(result.data);
+      //               });
+      //             });
+      //           },
+      //         ),
+      //         OutlineButton.icon(
+      //           label: Text(
+      //             "end",
+      //             style: TextStyle(fontSize: 20, color: Colors.red),
+      //           ),
+      //           icon: Icon(
+      //             Icons.cancel,
+      //             color: Colors.red,
+      //           ),
+      //           onPressed: () async {
+      //             await Firestore.instance
+      //                 .collection('users')
+      //                 .document(id.id)
+      //                 .updateData({
+      //               "group_id": "",
+      //             });
+      //             Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(
+      //                     builder: (context) => SecondScreen(id: id)));
+      //           },
+      //           shape: new RoundedRectangleBorder(
+      //             borderRadius: new BorderRadius.circular(8.0),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
+  Widget _panel(ScrollController sc) {
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 15,
+            ),
+            Text("Group Details",
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 24.0,
+                )),
+              SizedBox(
+              height: 15,
+            ),  
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: group.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  group[index]['name'].toString(),
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ],
+                            )),
+                            ListTile(
+                          onTap: () => launch(
+                              "google.navigation:q=${group[index]['lat']},${group[index]['lng']}"),
+                          title: Text(group[index]['phone']),
+                          trailing: Icon(Icons.navigation),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        ));
+  }
 }
-// AIzaSyA_8Jw4i9r9i4ADetiZPqwYVQpDlguj61E
