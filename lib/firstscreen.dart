@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import "image_banner.dart";
 import "secondscreen.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Id {
   var id;
@@ -13,6 +14,7 @@ Id id;
 class MainScreen extends StatelessWidget {
   final userNameInputController = TextEditingController();
   final userPhoneInputController = TextEditingController();
+  Position position;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,10 +101,13 @@ class MainScreen extends StatelessWidget {
                             //   });
                             // }
                             // else{
+                            position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
                             await Firestore.instance.collection('users').add({
                               "name": userNameInputController.text,
                               "phone": userPhoneInputController.text,
-                              "group_id": ""
+                              "group_id": "",
+                              "lat": position.latitude,
+                              "lng": position.longitude
                             }).then((value) {
                               id = Id(value.documentID);
                               //  print(id.id);
