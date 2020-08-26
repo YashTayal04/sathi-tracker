@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'secondscreen.dart';
 import 'firstscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 
 var groupId;
 
@@ -31,6 +32,33 @@ class MapsState extends State<ThirdScreen> {
   //   _lastMapPosition =position.target;
   // }
 
+  var geolocator = Geolocator();
+  var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+  StreamSubscription<Position> positionStream;
+  @override
+  void initState() {
+    super.initState();
+    positionStream = geolocator.getPositionStream(locationOptions).listen(
+      (Position position) {
+          updateLocation(position.latitude.toString(), position.longitude.toString());
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    positionStream.cancel();
+  }
+
+  void updateLocation(String lat, String lng) async {
+    await Firestore.instance
+        .collection('users')
+        .document(id.id)
+        .updateData({
+      "lat": lat,
+      "lng": lng
+    });
+  }
   @override
   Widget build(BuildContext context) {
     //  Firestore.instance.collection("users").document(id.id).get().then((value){
