@@ -19,6 +19,7 @@ class SecondScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text("Start your trip"),
         ),
@@ -75,7 +76,6 @@ class SecondScreen extends StatelessWidget {
                       ),
                       onPressed: () async {
                         // print(id.id);
-
                         if (userGroupIDInputController.text.isNotEmpty) {
                           group = Group(userGroupIDInputController.text);
                           QuerySnapshot result = await Firestore.instance
