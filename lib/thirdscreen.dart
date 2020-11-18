@@ -14,8 +14,8 @@ class ThirdScreen extends StatefulWidget {
   // ThirdScreen() : super();
   // final String title =" Maps";s
 
-  final Id id;
-  final Group group;
+  Id id;
+  Group group;
   ThirdScreen({this.id, this.group});
   @override
   MapsState createState() => MapsState();
@@ -35,18 +35,24 @@ class MapsState extends State<ThirdScreen> {
   // }
 
   var geolocator = Geolocator();
-  var locationOptions = LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
+
+  var locationOptions =
+      LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
   var group = [];
   StreamSubscription<Position> positionStream;
   @override
   void initState() {
     super.initState();
+    // print("ThirdScreen");
+    // print(id.id);
     updateGroup();
-    positionStream = geolocator.getPositionStream(locationOptions).listen(
-      (Position position) {
-          updateLocation(position.latitude.toString(), position.longitude.toString());
-          updateGroup();
-      });
+    positionStream = geolocator
+        .getPositionStream(locationOptions)
+        .listen((Position position) {
+      updateLocation(
+          position.latitude.toString(), position.longitude.toString());
+      updateGroup();
+    });
   }
 
   @override
@@ -60,21 +66,18 @@ class MapsState extends State<ThirdScreen> {
     await Firestore.instance
         .collection('users')
         .document(id.id)
-        .updateData({
-      "lat": lat,
-      "lng": lng
-    });
+        .updateData({"lat": lat, "lng": lng});
   }
 
   void updateGroup() {
     Firestore.instance
-      .collection("users")
-      .where("group_id", isEqualTo: widget.group.gid)
-      .snapshots()
-      .listen((result) {
-          result.documents.forEach((result) {
-            group.add(result.data);
-          });
+        .collection("users")
+        .where("group_id", isEqualTo: widget.group.gid)
+        .snapshots()
+        .listen((result) {
+      result.documents.forEach((result) {
+        group.add(result.data);
+      });
     });
   }
 
@@ -86,19 +89,17 @@ class MapsState extends State<ThirdScreen> {
     if (markerCount == 12) {
       return;
     }
-    if(markerCount == group.length) {
+    if (markerCount == group.length) {
       markers.clear();
       _markerIdCounter = 0;
     }
-    for(int index = _markerIdCounter ; index < group.length ; index++) {
+    for (int index = _markerIdCounter; index < group.length; index++) {
       final String markerIdVal = 'marker_id_$_markerIdCounter';
       _markerIdCounter++;
       final MarkerId markerId = MarkerId(markerIdVal);
       final Marker marker = Marker(
         markerId: markerId,
-        position: LatLng(
-          group[index]['lat'], group[index]['lng']
-        ),
+        position: LatLng(group[index]['lat'], group[index]['lng']),
         infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
       );
       setState(() {
@@ -115,7 +116,8 @@ class MapsState extends State<ThirdScreen> {
       ),
       body: SlidingUpPanel(
         panelBuilder: (sc) => _panel(sc),
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         minHeight: 50,
         body: Stack(
           children: <Widget>[
@@ -193,6 +195,7 @@ class MapsState extends State<ThirdScreen> {
       // ),
     );
   }
+
   Widget _panel(ScrollController sc) {
     return MediaQuery.removePadding(
         context: context,
@@ -207,9 +210,31 @@ class MapsState extends State<ThirdScreen> {
                   fontWeight: FontWeight.normal,
                   fontSize: 24.0,
                 )),
-              SizedBox(
+            SizedBox(
               height: 15,
-            ),  
+            ),
+            SizedBox(
+              height: 20,
+              width: 20,
+              child: RaisedButton.icon(
+                icon: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                color: Color(0xFF1963F2),
+                label: Text(
+                  "debuggggg",
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
+                onPressed: () async {
+                  print("ThirdScreen");
+                  print(id.id);
+                },
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(1.0),
+                ),
+              ),
+            ),
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -232,7 +257,7 @@ class MapsState extends State<ThirdScreen> {
                                 ),
                               ],
                             )),
-                            ListTile(
+                        ListTile(
                           onTap: () => launch(
                               "google.navigation:q=${group[index]['lat']},${group[index]['lng']}"),
                           title: Text(group[index]['phone']),

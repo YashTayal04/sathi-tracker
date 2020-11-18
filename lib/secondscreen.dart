@@ -15,11 +15,11 @@ Group group;
 class SecondScreen extends StatelessWidget {
   var id;
   SecondScreen({this.id});
-  final userGroupIDInputController = TextEditingController();
+  TextEditingController userGroupIDInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text("Start your trip"),
         ),
@@ -134,6 +134,8 @@ class SecondScreen extends StatelessWidget {
                       onPressed: () async {
                         Random random = new Random();
                         group = Group(random.nextInt(8999) + 1000);
+                        print("second screen");
+                        print(id.id);
                         await Firestore.instance
                             .collection('users')
                             .document(id.id)
@@ -151,6 +153,33 @@ class SecondScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // SizedBox(
+                  //   height: 40,
+                  //   width: 40,
+                  //   child: RaisedButton.icon(
+                  //     icon: Icon(
+                  //       Icons.add,
+                  //       color: Colors.white,
+                  //     ),
+                  //     color: Color(0xFF1963F2),
+                  //     label: Text(
+                  //       "Logout",
+                  //       style: TextStyle(fontSize: 20, color: Colors.white),
+                  //     ),
+                  //     onPressed: () async {
+                  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
+                  //     prefs.setString('username', null);
+
+                  //     setState(() {
+                  //       localID = '';
+                  //     });
+                  //     },
+                  //     shape: new RoundedRectangleBorder(
+                  //       borderRadius: new BorderRadius.circular(8.0),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             )
