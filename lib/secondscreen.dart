@@ -77,11 +77,13 @@ class SecondScreen extends StatelessWidget {
                       onPressed: () async {
                         // print(id.id);
                         if (userGroupIDInputController.text.isNotEmpty) {
-                          group = Group(userGroupIDInputController.text);
+                          group =
+                              Group(int.parse(userGroupIDInputController.text));
                           QuerySnapshot result = await Firestore.instance
                               .collection('users')
                               .where('group_id',
-                                  isEqualTo: userGroupIDInputController.text)
+                                  isEqualTo: int.parse(
+                                      userGroupIDInputController.text))
                               .limit(1)
                               .getDocuments();
                           if (result.documents.length == 1) {
@@ -89,7 +91,8 @@ class SecondScreen extends StatelessWidget {
                                 .collection('users')
                                 .document(id.id)
                                 .updateData({
-                              "group_id": userGroupIDInputController.text,
+                              "group_id":
+                                  int.parse(userGroupIDInputController.text),
                             });
 
                             Navigator.push(
