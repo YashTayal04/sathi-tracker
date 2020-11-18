@@ -142,6 +142,8 @@ class SecondScreen extends StatelessWidget {
                             .updateData({
                           "group_id": group.gid,
                         });
+                        print(id.id);
+                        print(group.gid);
                         Navigator.push(
                             context,
                             MaterialPageRoute(

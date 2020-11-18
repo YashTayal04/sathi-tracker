@@ -161,8 +161,10 @@ class _LoginState extends State<Login> {
                         onPressed: () async {
                           if (userPhoneInputController.text.isNotEmpty &&
                               userNameInputController.text.isNotEmpty) {
+                                print("Hello");
                             position = await Geolocator().getCurrentPosition(
                                 desiredAccuracy: LocationAccuracy.high);
+                            print("Hello");
                             await Firestore.instance.collection('users').add({
                               "name": userNameInputController.text,
                               "phone": userPhoneInputController.text,
@@ -171,6 +173,8 @@ class _LoginState extends State<Login> {
                               "lng": position.longitude
                             }).then((value) async {
                               id = Id(value.documentID);
+                              print(id);
+
                               SharedPreferences preferences =
                                   await SharedPreferences.getInstance();
                               preferences.setString(

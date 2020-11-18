@@ -17,11 +17,14 @@ class ThirdScreen extends StatefulWidget {
   Id id;
   Group group;
   ThirdScreen({this.id, this.group});
+  
+
   @override
   MapsState createState() => MapsState();
 }
 
 class MapsState extends State<ThirdScreen> {
+  
   Completer<GoogleMapController> _controller = Completer();
   // static const LatLng _center =const LatLng(45.521563, -122.677433);
   // final Set<Marker> _markers ={};
@@ -42,6 +45,7 @@ class MapsState extends State<ThirdScreen> {
   StreamSubscription<Position> positionStream;
   @override
   void initState() {
+    // print((id.id).toString());
     super.initState();
     // print("ThirdScreen");
     // print(id.id);
@@ -65,11 +69,12 @@ class MapsState extends State<ThirdScreen> {
     _markers();
     await Firestore.instance
         .collection('users')
-        .document(id.id)
+        .document(widget.id.id)
         .updateData({"lat": lat, "lng": lng});
   }
 
   void updateGroup() {
+    
     Firestore.instance
         .collection("users")
         .where("group_id", isEqualTo: widget.group.gid)
@@ -99,7 +104,7 @@ class MapsState extends State<ThirdScreen> {
       final MarkerId markerId = MarkerId(markerIdVal);
       final Marker marker = Marker(
         markerId: markerId,
-        position: LatLng(group[index]['lat'], group[index]['lng']),
+        position: LatLng(double.parse(group[index]['lat']), double.parse(group[index]['lng'])),
         infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
       );
       setState(() {
@@ -228,7 +233,10 @@ class MapsState extends State<ThirdScreen> {
                 ),
                 onPressed: () async {
                   print("ThirdScreen");
-                  print(id.id);
+                  print(widget.id.id);
+                  // group=[];
+                  // updateGroup();
+                  print(group);
                 },
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(1.0),
