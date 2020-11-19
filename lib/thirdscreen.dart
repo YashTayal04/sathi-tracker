@@ -17,14 +17,12 @@ class ThirdScreen extends StatefulWidget {
   Id id;
   Group group;
   ThirdScreen({this.id, this.group});
-  
 
   @override
   MapsState createState() => MapsState();
 }
 
 class MapsState extends State<ThirdScreen> {
-  
   Completer<GoogleMapController> _controller = Completer();
   // static const LatLng _center =const LatLng(45.521563, -122.677433);
   // final Set<Marker> _markers ={};
@@ -74,7 +72,6 @@ class MapsState extends State<ThirdScreen> {
   }
 
   void updateGroup() {
-    
     Firestore.instance
         .collection("users")
         .where("group_id", isEqualTo: widget.group.gid)
@@ -104,7 +101,8 @@ class MapsState extends State<ThirdScreen> {
       final MarkerId markerId = MarkerId(markerIdVal);
       final Marker marker = Marker(
         markerId: markerId,
-        position: LatLng(double.parse(group[index]['lat']), double.parse(group[index]['lng'])),
+        position: LatLng(double.parse(group[index]['lat']),
+            double.parse(group[index]['lng'])),
         infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
       );
       setState(() {
