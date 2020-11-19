@@ -55,7 +55,7 @@ class MapsState extends State<ThirdScreen> {
         .listen((Position position) {
       updateLocation(
           position.latitude.toString(), position.longitude.toString());
-      updateGroup();
+      // updateGroup();
     });
   }
 
@@ -117,7 +117,7 @@ class MapsState extends State<ThirdScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text((widget.group.gid).toString()),
+        title: Text((widget.group.gn).toString()),
       ),
       body: SlidingUpPanel(
         panelBuilder: (sc) => _panel(sc),
@@ -236,6 +236,7 @@ class MapsState extends State<ThirdScreen> {
                   print(widget.id.id);
                   // group=[];
                   // updateGroup();
+                  // initState();
                   print(group);
                 },
                 shape: new RoundedRectangleBorder(

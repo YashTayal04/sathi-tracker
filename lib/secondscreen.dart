@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'thirdscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'firstscreen.dart';
 import 'dart:math';
 
 class Group {
   var gid;
-  Group(this.gid);
+  var gn;
+  Group(this.gid, this.gn);
 }
 
 Group group;
@@ -15,6 +17,7 @@ Group group;
 class SecondScreen extends StatelessWidget {
   var id;
   SecondScreen({this.id});
+  Position position;
   TextEditingController userGroupIDInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -77,19 +80,32 @@ class SecondScreen extends StatelessWidget {
                       onPressed: () async {
                         // print(id.id);
                         if (userGroupIDInputController.text.isNotEmpty) {
-                          group = Group(userGroupIDInputController.text);
+                          print("Hello");
+                          // group = Group(int.parse(userGroupIDInputController.text));
                           QuerySnapshot result = await Firestore.instance
-                              .collection('users')
-                              .where('group_id',
-                                  isEqualTo: userGroupIDInputController.text)
+                              .collection('groups')
+                              .where('group_no',
+                                  isEqualTo: int.parse(userGroupIDInputController.text))
                               .limit(1)
                               .getDocuments();
+                              print(result.documents[0].documentID);
                           if (result.documents.length == 1) {
+                            position = await Geolocator().getCurrentPosition(
+                                desiredAccuracy: LocationAccuracy.high);
+                                group=Group(result.documents[0].documentID,int.parse(userGroupIDInputController.text));
                             await Firestore.instance
                                 .collection('users')
                                 .document(id.id)
                                 .updateData({
-                              "group_id": userGroupIDInputController.text,
+                              "group_id":group.gid ,
+                              "lat" : position.latitude,
+                              "lng" : position.longitude,
+                            });
+                            await Firestore.instance
+                                .collection('groups')
+                                .document(group.gid)
+                                .updateData({
+                              "members":FieldValue.arrayUnion([id.id]) ,
                             });
 
                             Navigator.push(
@@ -133,17 +149,41 @@ class SecondScreen extends StatelessWidget {
                       ),
                       onPressed: () async {
                         Random random = new Random();
-                        group = Group(random.nextInt(8999) + 1000);
+                        while (true){
+                          group = Group(0,random.nextInt(8999) + 1000);
+                          QuerySnapshot result = await Firestore.instance
+                              .collection('groups')
+                              .where('group_no',
+                                  isEqualTo: group.gn)
+                              .limit(1)
+                              .getDocuments();
+                              if (result.documents.length==0)
+                                break;
+                        }
+                        
                         print("second screen");
                         print(id.id);
-                        await Firestore.instance
-                            .collection('users')
-                            .document(id.id)
-                            .updateData({
-                          "group_id": group.gid,
-                        });
+                        await Firestore.instance.collection('groups').add({
+                              "radius" : 2,
+                              "group_no": group.gn,
+                              "member" : [id.id],
+
+                            }).then((value) async {
+                              group = Group(value.documentID, group.gn);});
+                              print(id);
                         print(id.id);
                         print(group.gid);
+                        position = await Geolocator().getCurrentPosition(
+                                desiredAccuracy: LocationAccuracy.high);
+                                // group=Group(result.documents[0].documentID);
+                            await Firestore.instance
+                                .collection('users')
+                                .document(id.id)
+                                .updateData({
+                              "group_id":group.gid ,
+                              "lat" : position.latitude,
+                              "lng" : position.longitude,
+                            });
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -155,33 +195,6 @@ class SecondScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // SizedBox(
-                  //   height: 40,
-                  //   width: 40,
-                  //   child: RaisedButton.icon(
-                  //     icon: Icon(
-                  //       Icons.add,
-                  //       color: Colors.white,
-                  //     ),
-                  //     color: Color(0xFF1963F2),
-                  //     label: Text(
-                  //       "Logout",
-                  //       style: TextStyle(fontSize: 20, color: Colors.white),
-                  //     ),
-                  //     onPressed: () async {
-                  //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-                  //     prefs.setString('username', null);
-
-                  //     setState(() {
-                  //       localID = '';
-                  //     });
-                  //     },
-                  //     shape: new RoundedRectangleBorder(
-                  //       borderRadius: new BorderRadius.circular(8.0),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             )
