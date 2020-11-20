@@ -105,7 +105,7 @@ class SecondScreen extends StatelessWidget {
                                 .collection('groups')
                                 .document(group.gid)
                                 .updateData({
-                              "members":FieldValue.arrayUnion([id.id]) ,
+                              "member":FieldValue.arrayUnion([id.id]) ,
                             });
 
                             Navigator.push(
