@@ -5,20 +5,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'firstscreen.dart';
 import 'dart:math';
-
+ 
 class Group {
   var gid;
   var gn;
   Group(this.gid, this.gn);
 }
-
+ 
 Group group;
-
+ 
 class SecondScreen extends StatelessWidget {
   var id;
   SecondScreen({this.id});
   Position position;
   TextEditingController userGroupIDInputController = TextEditingController();
+  TextEditingController userRadiusInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,6 +65,27 @@ class SecondScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Container(
+                    child: Text(
+                      " Radius",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                    child: TextField(
+                      controller: userRadiusInputController,
+                      decoration: InputDecoration(
+                        // prefixIcon: Icon(Icons.keyboard),
+                        border: OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 40,
                     width: 40,
@@ -88,7 +110,7 @@ class SecondScreen extends StatelessWidget {
                                   isEqualTo: int.parse(userGroupIDInputController.text))
                               .limit(1)
                               .getDocuments();
-                              print(result.documents[0].documentID);
+                              // print(result.documents[0].documentID);
                           if (result.documents.length == 1) {
                             position = await Geolocator().getCurrentPosition(
                                 desiredAccuracy: LocationAccuracy.high);
@@ -107,7 +129,7 @@ class SecondScreen extends StatelessWidget {
                                 .updateData({
                               "member":FieldValue.arrayUnion([id.id]) ,
                             });
-
+ 
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -164,16 +186,16 @@ class SecondScreen extends StatelessWidget {
                         print("second screen");
                         print(id.id);
                         await Firestore.instance.collection('groups').add({
-                              "radius" : 2,
+                              "radius" : int.parse(userRadiusInputController.text),
                               "group_no": group.gn,
                               "member" : [id.id],
-
+ 
                             }).then((value) async {
                               group = Group(value.documentID, group.gn);});
                               print(id);
-                        print(id.id);
-                        print(group.gid);
-                        position = await Geolocator().getCurrentPosition(
+                              print(id.id);
+                              print(group.gid);
+                              position = await Geolocator().getCurrentPosition(
                                 desiredAccuracy: LocationAccuracy.high);
                                 // group=Group(result.documents[0].documentID);
                             await Firestore.instance
@@ -199,6 +221,7 @@ class SecondScreen extends StatelessWidget {
               ),
             )
           ],
-        ));
+        )
+     );
   }
 }
