@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:android_intent/android_intent.dart';
+import 'package:geolocator/geolocator.dart';
 import "firstscreen.dart";
 import "secondscreen.dart";
 
@@ -20,6 +22,11 @@ void main() async {
   print("FirstScreen");
   print(localID);
   // }
+  if (!(await Geolocator().isLocationServiceEnabled())) {
+                                final AndroidIntent intent = AndroidIntent(
+          action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+       intent.launch();
+  }
   runApp(MaterialApp(
     home: localID == null ? Login() : SecondScreen(id: Id(localID)),
     // home: Login(),
