@@ -10,19 +10,16 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:math' show cos, sqrt, asin;
 
+var groupId;
+// var phoneNumber;
 var userLatitude;
 var userLongitude;
-// var radius;
-var groupId;
 
 class ThirdScreen extends StatefulWidget {
-  // ThirdScreen() : super();
-  // final String title =" Maps";s
 
   Id id;
   Group group;
-  int radius;
-  ThirdScreen({this.id, this.group, this.radius});
+  ThirdScreen({this.id, this.group});
 
   @override
   MapsState createState() => MapsState();
@@ -32,7 +29,7 @@ class MapsState extends State<ThirdScreen> {
   Completer<GoogleMapController> _controller = Completer();
 
   var geolocator = Geolocator();
-  // radiusVal = radius;
+
   var locationOptions =
       LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
   var group = [];
@@ -41,11 +38,28 @@ class MapsState extends State<ThirdScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Firestore.instance
+    //     .collection('users')
+    //     .get()
+    //     // .then((value) => phoneNumber = document.data['phone']);
+    //     // .then( Text(document.data()['full_name']),
+    //     .then(phoneNumber = result.data()['phone']);
+
+    // Firestore.instance
+    //     .collection("users")
+    //     .document(widget.id.id)
+    //     .snapshots()
+    //     .listen((result) {
+    //   phoneNumber = result.data['phone'];
+    // });
+
     positionStream = geolocator
         .getPositionStream(locationOptions)
         .listen((Position position) {
       updateLocation(
           position.latitude.toString(), position.longitude.toString());
+      // updateGroup();
     });
     updateGroup();
   }
@@ -57,6 +71,7 @@ class MapsState extends State<ThirdScreen> {
   }
 
   void updateLocation(String lat, String lng) async {
+    // _markers();
     userLatitude = lat;
     userLongitude = lng;
     await Firestore.instance
@@ -65,16 +80,21 @@ class MapsState extends State<ThirdScreen> {
         .updateData({"lat": lat, "lng": lng});
   }
 
+
+
   double _coordinateDistance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
+    var c = cos;
     var a = 0.5 -
-        cos((lat2 - lat1) * p) / 2 +
-        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
   }
 
-  void updateGroup() {
+
+   void updateGroup() {
     group.clear();
+    alreadyPresent.clear();
     Firestore.instance
         .collection("users")
         .where("group_id", isEqualTo: widget.group.gid)
@@ -90,30 +110,23 @@ class MapsState extends State<ThirdScreen> {
         final String userName = result.data['name'];
         final String markerIdVal = 'marker_id_$userName';
         final MarkerId markerId = MarkerId(markerIdVal);
-
         double distanceInMeters = _coordinateDistance(
-          double.parse(userLatitude),
-          double.parse(userLongitude),
-          double.parse(result.data['lat']),
-          double.parse(result.data['lng']),
+            userLatitude,
+            userLongitude,
+            result.data['lat'],
+            result.data['lng'],
         );
-
-        // print(distanceInMeters);
-
-        // distanceInMeters = 3000;
-
-        if (distanceInMeters > widget.radius*1000) {
+        if(distanceInMeters > 2000) {
           Fluttertoast.showToast(
-              // Bottom Alert
-              msg: "$userName has moved out of Range",
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.TOP,
-              // timeInSecForIos: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0);
+          // Bottom Alert
+          msg: "$userName has moved out of Range",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          // timeInSecForIos: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
         }
-
         final Marker marker = Marker(
           markerId: markerId,
           position: LatLng(double.parse(result.data['lat']),
@@ -203,32 +216,33 @@ class MapsState extends State<ThirdScreen> {
         //     });
         //   },
         // ),
-        child: OutlineButton.icon(
-          label: Text(
-            "end",
-            style: TextStyle(fontSize: 20, color: Colors.red),
-          ),
-          icon: Icon(
-            Icons.cancel,
-            color: Colors.red,
-          ),
-          onPressed: () async {
-            await Firestore.instance
-                .collection('users')
-                .document(widget.id.id)
-                .updateData({
-              "group_id": "",
-            });
-            updateGroup();
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SecondScreen(id: widget.id)));
-          },
-          shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(8.0),
-          ),
-        ),
+
+        // child: OutlineButton.icon(                // End Button
+        //   label: Text(
+        //     "end",
+        //     style: TextStyle(fontSize: 20, color: Colors.red),
+        //   ),
+        //   icon: Icon(
+        //     Icons.cancel,
+        //     color: Colors.red,
+        //   ),
+        //   onPressed: () async {
+        //     alreadyPresent.remove(phoneNumber);
+        //     await Firestore.instance
+        //         .collection('users')
+        //         .document(widget.id.id)
+        //         .updateData({
+        //       "group_id": "",
+        //     });
+        //     updateGroup();
+        //     Navigator.push(context,
+        //         MaterialPageRoute(builder: (context) => SecondScreen(id: id)));
+        //   },
+        //   shape: new RoundedRectangleBorder(
+        //     borderRadius: new BorderRadius.circular(8.0),
+        //   ),
+        // ),
+
         // ],
       ),
       // ),
@@ -269,10 +283,7 @@ class MapsState extends State<ThirdScreen> {
                 onPressed: () async {
                   print("ThirdScreen");
                   print(widget.id.id);
-                  print("RADIUS=");
-                  print(widget.radius);
-                  // print(userLatitude);
-                  // print(userLongitude);
+                  // print(phoneNumber);
                   // group=[];
                   // updateGroup();
                   // initState();

@@ -14,13 +14,14 @@ class Group {
 }
 
 Group group;
+int radius;
 
 class SecondScreen extends StatelessWidget {
   var id;
   SecondScreen({this.id});
   // Position position;
   TextEditingController userGroupIDInputController = TextEditingController();
-  // TextEditingController userRadiusInputController = TextEditingController();
+  TextEditingController userRadiusInputController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,6 +57,28 @@ class SecondScreen extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                     child: TextField(
                       controller: userGroupIDInputController,
+                      decoration: InputDecoration(
+                        // prefixIcon: Icon(Icons.keyboard),
+                        border: OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    child: Text(
+                      " Radius",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                    child: TextField(
+                      controller: userRadiusInputController,
                       decoration: InputDecoration(
                         // prefixIcon: Icon(Icons.keyboard),
                         border: OutlineInputBorder(
@@ -124,8 +147,8 @@ class SecondScreen extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        ThirdScreen(id: id, group: group)));
+                                    builder: (context) => ThirdScreen(
+                                        id: id, group: group, radius: radius)));
                           }
                         }
                       },
@@ -196,7 +219,7 @@ class SecondScreen extends StatelessWidget {
                         print("second screen");
                         print(id.id);
                         await Firestore.instance.collection('groups').add({
-                          // "radius" : int.parse(userRadiusInputController.text),
+                          "radius": int.parse(userRadiusInputController.text),
                           "radius": 2,
                           "group_no": group.gn,
                           "member": [id.id],
@@ -227,8 +250,11 @@ class SecondScreen extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    ThirdScreen(id: id, group: group)));
+                                builder: (context) => ThirdScreen(
+                                    id: id,
+                                    group: group,
+                                    radius: int.parse(
+                                        userRadiusInputController.text))));
                       },
                       shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(8.0),
